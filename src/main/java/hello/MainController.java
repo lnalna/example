@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Objects;
+import java.util.Optional;
+
 @Controller    // This means that this class is a Controller
 @RequestMapping(path="/demo") // This means URL's start with /demo (after Application path)
 public class MainController {
@@ -30,5 +33,27 @@ public class MainController {
 	public @ResponseBody Iterable<User> getAllUsers() {
 		// This returns a JSON or XML with the users
 		return userRepository.findAll();
+	}
+
+	@GetMapping(path="/delByNameAndEmail")
+	public @ResponseBody String delByNameAndEmail(@RequestParam String name, @RequestParam String email) {
+
+		User delUser = userRepository.findByNameAndEmail(name, email);
+		if (Objects.nonNull(delUser)) {
+			userRepository.delete(delUser);
+			return "Deleted user " + delUser;
+		}
+		return "Not found such user " ;
+	}
+
+	@GetMapping(path="/delById")
+	public @ResponseBody String delById(@RequestParam Integer id) {
+		Optional<User> delUser = userRepository.findById(id);
+
+		if(delUser.isPresent()) {
+			userRepository.delete(delUser.get());
+			return "Deleted user " + delUser.get();
+		}
+		return "Not found such user " ;
 	}
 }
